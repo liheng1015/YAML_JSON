@@ -1,0 +1,14 @@
+任意创建用户并使用密文加密,并使用变量过滤器password_hash加密用的
+[root@ansible ~]# cat user2.yml 
+---
+- hosts: db
+  remote_user: root
+#  vars:
+#    username: l4
+  tasks:
+    - name: create user "{{username}}"
+      user:
+        name: "{{username}}"
+        group: users
+        password: "{{'123'|password_hash('sha512')}}"   密文加密
+#    - shell: echo 123 |passwd --stdin "{{username}}"
