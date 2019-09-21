@@ -1,0 +1,12 @@
+error的处理,对于一些创建的文件夹,创建过的报错正常,也要往下进行,因为不影响结果,所以报错不管ignore
+[root@ansible ~]# vim error.yml
+---
+- hosts: cache
+  remote_user: root
+  tasks:
+    - shell: mkdir /tmp/cache
+      ignore_errors: True
+    - name: Restart
+      service:
+        name: httpd
+        state: restarted
