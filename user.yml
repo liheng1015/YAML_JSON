@@ -1,0 +1,12 @@
+创建用户l4并用vars做变量,
+[root@ansible ~]# vim user.yml
+---
+- hosts: all
+  remote_user: root
+  vars:
+    username: l4
+  tasks:
+    - name: create user "{{username}}"
+      user:
+        name: "{{username}}"
+    - shell: echo 123 |passwd --stdin "{{username}}"
