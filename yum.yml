@@ -1,0 +1,17 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: yum install nginx
+      yum:
+        name: nginx
+        state: latest
+    - name: command
+      shell: sed -i 's,#pid        logs/nginx.pid;,pid        /var/run/nginx.pid;,' /usr/local/nginx/conf/nginx.conf
+      args:
+        chdir: /mnt
+    - name: yum start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
