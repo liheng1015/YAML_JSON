@@ -1,0 +1,26 @@
+tag和handlers触发器指定某个执行某个任务,并启用触发器进行重启服务操作
+[root@ansible ~]# cat handlers.yml 
+- hosts: web
+  remote_user: root
+  tasks: 
+    - copy: 
+        src: httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+        owner: root
+        group: root
+        mode: 0644
+      tags: chage_conf                        执行任务标签
+      notify:                                 调用触发器
+         - reload_httpd
+    - copy: 
+        src: index.html
+        dest: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: 0644
+      tags: chage_index
+  handlers:                                     触发器
+    - name: reload_httpd
+      service: 
+        name: httpd
+        state: restarted 
