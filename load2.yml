@@ -1,0 +1,14 @@
+debug调试信息debug:var=result,显示result的调试信息
+[root@ansible ~]# cat load2.yml 
+---
+- hosts: web
+  remote_user: root
+  tasks: 
+    - shell: uptime |awk '{printf("%.2f",$(NF-2))}'
+      register: result
+    - service: 
+        name: httpd
+        state: stopped
+      when: result.stdout|float > 0.7     .stdout是标准输出以转换数字跟0.7比较
+    - name: show debug info
+      debug: var=result
