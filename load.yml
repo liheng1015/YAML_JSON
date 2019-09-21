@@ -1,0 +1,14 @@
+when条件判断
+register保存上一个命令的执行结果(保存的不止有返回值,结果,基础命令,状态,输出,开始时间,结束时间一切的执行现场)
+[root@ansible ~]# cat load.yml 
+---
+- hosts: web
+  remote_user: root
+  tasks: 
+    - shell: uptime |awk '{printf("%.2f",$(NF-2))}'
+      register: result
+    - service: 
+        name: httpd
+        state: stopped
+      when: result.stdout|float > 0.7     .stdout是标准输出以转换数字跟0.7比较
+[root@ansible ~]#
