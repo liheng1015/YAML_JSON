@@ -1,0 +1,20 @@
+多用户创建一个组就是一个item,所有变量换成item
+[root@ansible ~]# vim users.yml
+---
+- hosts: db
+  remote_user: root
+  tasks:
+    - name: create user "{{item}}"
+      user:
+        name: "{{item.username}}"
+        group: "{{item.group}}"
+        password: "{{item.password|password_hash('sha512')}}"
+      with_items:                                  
+        -                                                        数组
+          username: nb
+          group: users
+          password: "123456"
+        - 
+          username: wk
+          group: bin
+          password: banana
