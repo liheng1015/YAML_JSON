@@ -1,0 +1,75 @@
+---
+- hosts: ceph
+  remote_user: root
+  tasks: 
+    - name: yum install ceph-mon ceph-osd ceph-mds
+      yum: 
+        name: ceph-mon,ceph-osd,ceph-mds
+        #state: latest
+        #register: result 
+- hosts: ceph-cluster
+  remote_user: root
+  tasks:
+    - name: command
+      shell: ceph-deploy mon create-initial
+      args:
+        chdir: /root/ceph-cluster
+- hosts: ceph
+  remote_user: root
+  tasks:
+    - name: script ceph.sh
+      script: /root/jiaoben/ceph.sh
+- hosts: ceph-cluster
+  remote_user: root
+  tasks:
+    - name: command ceph-0001
+      shell: ceph-deploy disk  zap  ceph-0001:vdc   ceph-0001:vdd
+      args:
+        chdir: /root/ceph-cluster
+    - name: command ceph-0002
+      shell: ceph-deploy disk  zap  ceph-0002:vdc   ceph-0002:vdd
+      args:
+        chdir: /root/ceph-cluster
+    - name: command ceph-0003
+      shell: ceph-deploy disk  zap  ceph-0003:vdc   ceph-0003:vdd 
+      args:
+        chdir: /root/ceph-cluster
+    - name: command ceph-0001
+      shell: ceph-deploy osd create  ceph-0001:vdc:/dev/vdb1 ceph-0001:vdd:/dev/vdb2
+      args:
+        chdir: /root/ceph-cluster
+    - name: command ceph-0002
+      shell: ceph-deploy osd create  ceph-0002:vdc:/dev/vdb1 ceph-0002:vdd:/dev/vdb2
+      args:
+        chdir: /root/ceph-cluster
+    - name: command ceph-0003
+      shell:  ceph-deploy osd create  ceph-0003:vdc:/dev/vdb1 ceph-0003:vdd:/dev/vdb2
+      args:
+        chdir: /root/ceph-cluster
+    - name: command mds
+      shell: ceph-deploy mds create ceph-0003
+      args:
+        chdir: /root/ceph-cluster
+    - name: command osd pool
+      shell: ceph osd pool create cephfs_data 128
+      args:
+        chdir: /root/ceph-cluster
+    - name: command osd pool
+      shell: ceph osd pool create cephfs_metadata 128
+      args:
+        chdir: /root/ceph-cluster
+    - name: command myfs1
+      shell: ceph fs new myfs1 cephfs_metadata cephfs_data
+      args:
+        chdir: /root/ceph-cluster
+        
+        [root@proxy jiaoben]# cat ceph.sh 
+#!/bin/bash
+chown  ceph.ceph  /dev/vdb1
+chown  ceph.ceph  /dev/vdb2
+echo 'ENV{DEVNAME}=="/dev/vdb1",OWNER="ceph",GROUP="ceph"' >> /etc/udev/rules.d/70-vdb.rules
+echo 'ENV{DEVNAME}=="/dev/vdb2",OWNER="ceph",GROUP="ceph"' >> /etc/udev/rules.d/70-vdb.rules
+
+        
+        
+        
